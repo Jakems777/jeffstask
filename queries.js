@@ -1,31 +1,26 @@
 const debug = require('debug')('app:queries');
 const phone = require('phone');
-
+const conf = require('./conf.js');
 const promise = require('bluebird');
-
 const options = {
     // Initialization Options
     promiseLib: promise
 };
-
 const pgp = require('pg-promise')(options);
-const connectionString = 'postgres://jevgenim:12345678@localhost:5432/client';
-const db = pgp(connectionString);
-
-const crypto = require('crypto'),
-    algorithm = 'aes-256-ctr',
-    password = 'd6F3Efeq';
+const db = pgp(conf.connStr);
+const crypto = require('crypto');
 
 function encrypt(text) {
-    let cipher = crypto.createCipher(algorithm, password)
-    let crypted = cipher.update(text, 'utf8', 'hex')
+    let cipher = crypto.createCipher(conf.algorithm, conf.password);
+    let crypted = cipher.update(text, 'utf8', 'hex');
     crypted += cipher.final('hex');
     return crypted;
 }
 
 function decrypt(text) {
-    let decipher = crypto.createDecipher(algorithm, password)
-    let dec = decipher.update(text, 'hex', 'utf8')
+    let decipher = crypto.createDecipher(conf.algorithm, conf.password);
+    let dec = decipher.update(text, 'hex', 'utf8');
+
     dec += decipher.final('utf8');
     return dec;
 }
@@ -38,9 +33,7 @@ function decryptAndReplace(phoneField) {
 module.exports = {
     getAllClients: getAllClients,
     getSingleClient: getSingleClient,
-    createClient: createClient,
-    updateClient: updateClient,
-    removeClient: removeClient
+    createClient: createClient
 };
 //get all
 function getAllClients(req, res, next) {
@@ -53,7 +46,6 @@ function getAllClients(req, res, next) {
                 .json({
                     status: 'success',
                     data: data
-
                 });
             //debug('Got data from DB, number of records: %o',data);
         })
@@ -122,40 +114,6 @@ function createClient(req, res, next) {
                 status: 'success',
                 message: 'Inserted one client'
             });
-        })
-        .catch(function (err) {
-            return next(err);
-        });
-}
-
-//update
-function updateClient(req, res, next) {
-    db.none('update client set phone=$1, email=$2, firstname=$3, surname=$4, create_timestamp=$5, pin=$6, account_active=$7, status=$8, failed_login_attempts=$9  where id=$10',
-        [req.body.phone, req.body.email, req.body.firstname, req.body.surname, req.body.create_timestamp, req.body.pin,
-            req.body.account_active, req.body.status, req.body.failed_login_attempts, parseInt(req.params.id)])
-        .then(function () {
-            res.status(200)
-                .json({
-                    status: 'success',
-                    message: 'Updated Client'
-                });
-        })
-        .catch(function (err) {
-            return next(err);
-        });
-}
-//delete
-function removeClient(req, res, next) {
-    const clientId = parseInt(req.params.id);
-    db.result('delete from client where id = $1', clientId)
-        .then(function (result) {
-            /* jshint ignore:start */
-            res.status(200)
-                .json({
-                    status: 'success',
-                    message: 'Removed:' + result.rowCount + ' row/s, with client_id:' + clientId
-                });
-            /* jshint ignore:end */
         })
         .catch(function (err) {
             return next(err);
