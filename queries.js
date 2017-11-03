@@ -20,7 +20,6 @@ function encrypt(text) {
 function decrypt(text) {
     let decipher = crypto.createDecipher(conf.algorithm, conf.password);
     let dec = decipher.update(text, 'hex', 'utf8');
-
     dec += decipher.final('utf8');
     return dec;
 }
@@ -29,12 +28,8 @@ function decryptAndReplace(phoneField) {
     return decrypt(phoneField).replace(/.(?=.{4})/g, '*');
 }
 
-//CRUD operations
-module.exports = {
-    getAllClients: getAllClients,
-    getSingleClient: getSingleClient,
-    createClient: createClient
-};
+//CRUD OPERATIONS BEGIN HERE
+
 //get all
 function getAllClients(req, res, next) {
     db.any('select * from client limit 100')
@@ -75,7 +70,7 @@ function getSingleClient(req, res, next) {
 function createClient(req, res, next) {
     const body = req.body;
 
-    function showErrorMessage(message) {
+    function formatErrorMessage(message) {
         const response = {
             status: 'ERROR',
             message: message
@@ -89,16 +84,16 @@ function createClient(req, res, next) {
     }
 
     if (!body.phone || !body.email) {
-        return res.status(400).json(showErrorMessage('Missing mandatory fields'));
+        return res.status(400).json(formatErrorMessage('Missing mandatory fields'));
     }
 
     let isPhoneGBR = phone(body.phone);
     if (isPhoneGBR[1] !== 'GBR') {
-        return res.status(400).json(showErrorMessage('Not a GBR (UK) format phone number!'));
+        return res.status(400).json(formatErrorMessage('Not a GBR (UK) format phone number!'));
     }
 
     if (!(validateEmail(body.email))) {
-        return res.status(400).json(showErrorMessage('Email should be an email format, reg exp check!'));
+        return res.status(400).json(formatErrorMessage('Email should be an email format, reg exp check!'));
     }
 
     let formattedBody = Object.assign({}, body);
@@ -119,3 +114,10 @@ function createClient(req, res, next) {
             return next(err);
         });
 }
+
+
+module.exports = {
+    getAllClients: getAllClients,
+    getSingleClient: getSingleClient,
+    createClient: createClient
+};

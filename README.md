@@ -1,5 +1,8 @@
 ## Jeff's test task
 
+### Preconditions
+- you need Postgres to actually start it running, PSequel to view it and LTS version of node
+
 ### Installation
 - run `npm install`
 - run as sudo : `psql -f client.sql`
@@ -18,6 +21,9 @@ json body as:
 	"randomfield":"randomdata",
 	"sandomfield":"randggfdgomdata"
 }
+
+(you can add more fields, phone and email are mandatory fields, rest are optional)
+
 
 ### Example GET route
 

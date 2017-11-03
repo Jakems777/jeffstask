@@ -1,4 +1,4 @@
-var express = require('express');
+const express = require('express');
 const path = require('path');
 const favicon = require('serve-favicon');
 const logger = require('morgan');
@@ -25,7 +25,7 @@ app.use('/users', users);
 app.use(expressValidator());
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-    var err = new Error('Not Found');
+    let err = new Error('Not Found');
     err.status = 404;
     next(err);
 });
