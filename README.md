@@ -14,14 +14,14 @@
 
 ### Example POST
 json body as:
-
+```
 {	
 	"phone": "+427732436111",
 	"email": "ddds{@a.com",
 	"randomfield":"randomdata",
 	"sandomfield":"randggfdgomdata"
 }
-
+```
 (you can add more fields, phone and email are mandatory fields, rest are optional)
 
 
